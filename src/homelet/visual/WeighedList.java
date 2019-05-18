@@ -5,6 +5,10 @@ import java.util.Iterator;
 
 public class WeighedList<E> implements Iterable<E>{
 	
+	public int size(){
+		return size;
+	}
+	
 	private Node start, end;
 	private int size, modCount;
 	
@@ -45,27 +49,9 @@ public class WeighedList<E> implements Iterable<E>{
 	}
 	
 	public void add(E item, double weight){
-		if(start.next == end){
-			// if start.next is end means no item is in the list, thus, append the item to the end of the list
+		if(start.next == end)
 			append(item, weight);
-		}else if(weight < start.next.weight){
-			// if the weight is smaller to the start weight
-			prepend(item, weight);
-		}else if(weight > end.prev.weight){
-			// if the weight is larger to the end weight
-			append(item, weight);
-		}else if(weight == start.next.weight){
-			// append the item and scroll to the the last one
-			Node n = scrollTillSameWeight(start.next);
-			add(n, item, weight);
-		}else if(weight == end.prev.weight){
-			// append the item to the end of the list which guarantee is the last one
-			append(item, weight);
-		}else{
-			// first find the weight and scroll to the end of that then add the node
-			Node n = scrollTillSameWeight(searchPoz(start.next, 0, weight, 0, size));
-			add(n, item, weight);
-		}
+		add(searchPoz(weight), item, weight);
 	}
 	
 	public void remove(E item){
@@ -105,45 +91,11 @@ public class WeighedList<E> implements Iterable<E>{
 		this.modCount++;
 	}
 	
-	private Node searchPoz(Node reference, int pos, double weight, int left, int right){
-		// if left is right means the pos should be smaller than left and larger than right hence the reference node is
-		// the true result
-		if(left == right)
-			return reference;
-		// divide the section in half, and scroll the reference to the point
-		int half = (right + left) / 2;
-		reference = scroll(reference, half - pos);
-		// if the reference is right then returns it, else search the left side and right side
-		if(reference.weight == weight)
-			return reference;
-		else if(reference.weight > weight)
-			return searchPoz(reference, half, weight, left, half - 1);
-		else
-			return searchPoz(reference, half, weight, half + 1, right);
-	}
-	
-	private Node scroll(Node n, int step){
-		if(step > 0){
-			Node node;
-			for(node = n; node.next != end && step != 0; step--){
-				node = node.next;
-			}
-			return node;
-		}else if(step < 0){
-			Node node;
-			for(node = n; node.prev != start && step != 0; step++){
-				node = node.prev;
-			}
-			return node;
-		}
-		return n;
-	}
-	
-	private Node scrollTillSameWeight(Node n){
-		double expectedWeight = n.weight;
-		Node   node;
-		for(node = n.next; node.next != end && n.weight == expectedWeight; ){
-			node = node.next;
+	private Node searchPoz(double weight){
+		Node node;
+		for(node = start.next; node != end; node = node.next){
+			if(node.weight > weight)
+				break;
 		}
 		return node.prev;
 	}
@@ -181,7 +133,7 @@ public class WeighedList<E> implements Iterable<E>{
 		@Override
 		public boolean hasNext(){
 			checkForConcurrentModification();
-			return current.next != end;
+			return current != end;
 		}
 		
 		@Override
