@@ -2,8 +2,9 @@ package homelet.visual;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.LinkedList;
 
-public class WeighedList<E> implements Iterable<E>{
+public final class WeighedList<E> implements Iterable<E>{
 	
 	public int size(){
 		return size;
@@ -63,13 +64,27 @@ public class WeighedList<E> implements Iterable<E>{
 		}
 	}
 	
-	public void remove(double weight){
+	public E remove(double weight){
 		for(Node node = start.next; node != end; node = node.next){
 			if(node.weight == weight){
 				remove(node);
-				return;
+				return node.item;
 			}
 		}
+		return null;
+	}
+	
+	public Object[] removeAll(double weight){
+		LinkedList<E> item = new LinkedList<>();
+		for(Node node = start.next; node != end; node = node.next){
+			if(node.weight > weight){
+				break;
+			}else if(node.weight == weight){
+				remove(node);
+				item.add(node.item);
+			}
+		}
+		return item.toArray();
 	}
 	
 	private void remove(Node node){
@@ -120,7 +135,7 @@ public class WeighedList<E> implements Iterable<E>{
 		return new Itr();
 	}
 	
-	class Itr implements Iterator<E>{
+	private class Itr implements Iterator<E>{
 		
 		final int expectedModeCount;
 		Node current;

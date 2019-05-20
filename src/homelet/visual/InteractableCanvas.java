@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 
-public class InteractableCanvas extends Canvas implements Interactable, Runnable{
+public final class InteractableCanvas extends Canvas implements Interactable, Runnable{
 	
 	@Override
 	public void addKeyInteraction(Object o){

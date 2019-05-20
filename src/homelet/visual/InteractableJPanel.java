@@ -9,7 +9,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
 
-public class InteractableJPanel extends JPanel implements Interactable{
+public final class InteractableJPanel extends JPanel implements Interactable{
 	
 	@Override
 	public void addKeyInteraction(Object o){

@@ -1,11 +1,15 @@
 package homelet.visual;
 
+import homelet.visual.interfaces.Hoverable;
 import homelet.visual.interfaces.Interactable;
+import homelet.visual.interfaces.Locatable;
 import homelet.visual.interfaces.Renderable;
 
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.Rectangle2D;
 
-public class RenderManager{
+public final class RenderManager implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener{
 	
 	public static RenderManager createPassiveStyleRenderManager(String name, int FPS){
 		return createPassiveStyleRenderManager(name, FPS, false, true);
@@ -86,6 +90,7 @@ public class RenderManager{
 		this.name = name;
 		this.printFlag = printFlag;
 		this.clearScreenFlag = clearScreenFlag;
+		addInteraction(this);
 	}
 	
 	/**
@@ -98,16 +103,24 @@ public class RenderManager{
 	public boolean add(Object renderable, double weight){
 		if(!(renderable instanceof Renderable))
 			return false;
-		addInteraction(renderable);
 		list.add(renderable, weight);
 		return true;
 	}
 	
 	public void add(RenderGroup group, double weight){
-		for(Renderable render : group){
-			addInteraction(render);
-		}
 		list.add(group, weight);
+	}
+	
+	public void remove(Renderable renderable){
+		list.remove(renderable);
+	}
+	
+	public void remove(RenderGroup group){
+		list.remove(group);
+	}
+	
+	public Object[] removeAll(double weight){
+		return list.removeAll(weight);
 	}
 	
 	private void addInteraction(Object renderable){
@@ -115,6 +128,168 @@ public class RenderManager{
 		canvas.addMouseInteraction(renderable);
 	}
 	
+	private void removeInteraction(Object renderable){
+		canvas.removeKeyInteraction(renderable);
+		canvas.removeMouseInteraction(renderable);
+	}
+	
 	void render(Graphics2D g){
+		forEach(list, (e)->{
+			render(g, (Renderable) e);
+		});
+	}
+	
+	private void render(Graphics2D g, Renderable renderable){
+	}
+	
+	private void forEach(Iterable iterable, Action action){
+		for(Object obj : iterable){
+			if(obj instanceof Iterable)
+				forEach((Iterable) obj, action);
+			action.call(obj);
+		}
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e){
+		forEach(list, (item)->{
+			if(item instanceof KeyListener)
+				((KeyListener) item).keyTyped(e);
+		});
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e){
+		forEach(list, (item)->{
+			if(item instanceof KeyListener)
+				((KeyListener) item).keyPressed(e);
+		});
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e){
+		forEach(list, (item)->{
+			if(item instanceof KeyListener)
+				((KeyListener) item).keyReleased(e);
+		});
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint()))
+						return;
+				}
+				((MouseListener) item).mouseClicked(e);
+			}
+		});
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint()))
+						return;
+				}
+				((MouseListener) item).mousePressed(e);
+			}
+		});
+	}
+	
+	@Override
+	public void mouseReleased(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint()))
+						return;
+				}
+				((MouseListener) item).mouseReleased(e);
+			}
+		});
+	}
+	
+	@Override
+	public void mouseEntered(MouseEvent e){}
+	
+	@Override
+	public void mouseExited(MouseEvent e){}
+	
+	@Override
+	public void mouseDragged(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseMotionListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint())){
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(false);
+						return;
+					}else{
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(true);
+					}
+				}
+				((MouseMotionListener) item).mouseDragged(e);
+			}
+		});
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseMotionListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint())){
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(false);
+						if(item instanceof MouseListener)
+							((MouseListener) item).mouseExited(e);
+						return;
+					}else{
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(true);
+						if(item instanceof MouseListener){
+//							if(items)
+//								((MouseListener) item).mouseEntered(e);
+						}
+					}
+				}
+				((MouseMotionListener) item).mouseMoved(e);
+			}
+		});
+	}
+	
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseWheelListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(e.getPoint())){
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(false);
+						return;
+					}else{
+						if(item instanceof Hoverable)
+							((Hoverable) item).setHovering(true);
+					}
+				}
+				((MouseWheelListener) item).mouseWheelMoved(e);
+			}
+		});
+	}
+	
+	interface Action{
+		
+		void call(Object o);
 	}
 }
