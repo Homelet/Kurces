@@ -80,52 +80,52 @@ public enum Alignment{
 		switch(alignment){
 			case NORTH_WEST:
 			case TOP_LEFT:
-				return GH.point(usingFloat, container_x, container_y);
+				return ShapeUtil.point(container_x, container_y);
 			case NORTH:
 			case TOP:
-				return GH.point(usingFloat, container_x + (container_width - object_width) / 2, container_y);
+				return ShapeUtil.point(container_x + (container_width - object_width) / 2, container_y);
 			case NORTH_EAST:
 			case TOP_RIGHT:
-				return GH.point(usingFloat, container_x + (container_width - object_width), container_y);
+				return ShapeUtil.point(container_x + (container_width - object_width), container_y);
 			case WEST:
 			case LEFT:
-				return GH.point(usingFloat, container_x, container_y + (container_height - object_height) / 2);
+				return ShapeUtil.point(container_x, container_y + (container_height - object_height) / 2);
 			case ORIGIN:
 			case CENTER:
-				return GH.point(usingFloat, container_x + (container_width - object_width) / 2, container_y + (container_height - object_height) / 2);
+				return ShapeUtil.point(container_x + (container_width - object_width) / 2, container_y + (container_height - object_height) / 2);
 			case EAST:
 			case RIGHT:
-				return GH.point(usingFloat, container_x + (container_width - object_width), container_y + (container_height - object_height) / 2);
+				return ShapeUtil.point(container_x + (container_width - object_width), container_y + (container_height - object_height) / 2);
 			case SOUTH_WEST:
 			case BOTTOM_LEFT:
-				return GH.point(usingFloat, container_x, container_y + (container_height - object_height));
+				return ShapeUtil.point(container_x, container_y + (container_height - object_height));
 			case SOUTH:
 			case BOTTOM:
-				return GH.point(usingFloat, container_x + (container_width - object_width) / 2, container_y + (container_height - object_height));
+				return ShapeUtil.point(container_x + (container_width - object_width) / 2, container_y + (container_height - object_height));
 			case SOUTH_EAST:
 			case BOTTOM_RIGHT:
-				return GH.point(usingFloat, container_x + (container_width - object_width), container_y + (container_height - object_height));
+				return ShapeUtil.point(container_x + (container_width - object_width), container_y + (container_height - object_height));
 			case KEEP_X_ON_WEST:
 			case KEEP_X_ON_LEFT:
-				return GH.point(usingFloat, container_x, container_y + object_y);
+				return ShapeUtil.point(container_x, container_y + object_y);
 			case KEEP_X_ON_ORIGIN:
 			case KEEP_X_ON_CENTER:
-				return GH.point(usingFloat, container_x + (container_width - object_width) / 2, container_y + object_y);
+				return ShapeUtil.point(container_x + (container_width - object_width) / 2, container_y + object_y);
 			case KEEP_X_ON_EAST:
 			case KEEP_X_ON_RIGHT:
-				return GH.point(usingFloat, container_x + container_width - object_width, container_y + object_y);
+				return ShapeUtil.point(container_x + container_width - object_width, container_y + object_y);
 			case KEEP_Y_ON_NORTH:
 			case KEEP_Y_ON_TOP:
-				return GH.point(usingFloat, container_x + object_x, container_y);
+				return ShapeUtil.point(container_x + object_x, container_y);
 			case KEEP_Y_ON_ORIGIN:
 			case KEEP_Y_ON_CENTER:
-				return GH.point(usingFloat, container_x + object_x, container_y + (container_height - object_height) / 2);
+				return ShapeUtil.point(container_x + object_x, container_y + (container_height - object_height) / 2);
 			case KEEP_Y_ON_SOUTH:
 			case KEEP_Y_ON_BOTTOM:
-				return GH.point(usingFloat, container_x + object_x, container_y + container_height - object_height);
+				return ShapeUtil.point(container_x + object_x, container_y + container_height - object_height);
 			case FREE:
 			default:
-				return GH.point(usingFloat, container_x + object_x, container_y + object_y);
+				return ShapeUtil.point(container_x + object_x, container_y + object_y);
 		}
 	}
 }
