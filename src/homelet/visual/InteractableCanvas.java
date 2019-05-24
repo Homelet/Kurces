@@ -71,6 +71,7 @@ public final class InteractableCanvas extends Canvas implements Interactable, Ru
 			if(FPS_target <= 0 || delta >= 1){
 				FPSBuffer++;
 				delta = 0;
+				manager.tick();
 				render(bs);
 			}
 			if(timer >= 1000000000){

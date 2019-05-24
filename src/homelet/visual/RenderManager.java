@@ -1,9 +1,9 @@
 package homelet.visual;
 
-import homelet.visual.interfaces.Hoverable;
 import homelet.visual.interfaces.Interactable;
 import homelet.visual.interfaces.Locatable;
 import homelet.visual.interfaces.Renderable;
+import homelet.visual.interfaces.Tickable;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -133,13 +133,30 @@ public final class RenderManager implements MouseListener, MouseMotionListener, 
 		canvas.removeMouseInteraction(renderable);
 	}
 	
-	void render(Graphics2D g){
+	void tick(){
 		forEach(list, (e)->{
-			render(g, (Renderable) e);
+			if(e instanceof Tickable)
+				tick((Tickable) e);
 		});
 	}
 	
-	private void render(Graphics2D g, Renderable renderable){
+	private void tick(Tickable tickable){
+		if(tickable.isTicking())
+			tickable.tick();
+	}
+	
+	void render(Graphics2D g){
+		final Rectangle clipBounds = g.getClipBounds();
+		forEach(list, (e)->{
+			render(g, clipBounds, (Renderable) e);
+		});
+	}
+	
+	private void render(Graphics2D g, Rectangle clipBounds, Renderable renderable){
+		if(!renderable.isRendering())
+			return;
+		Rectangle bound = renderable instanceof Locatable ? clipBounds.intersection(((Locatable) renderable).getBounds().getBounds()) : clipBounds;
+		renderable.render((Graphics2D) g.create(bound.x, bound.y, bound.width, bound.height));
 	}
 	
 	private void forEach(Iterable iterable, Action action){
@@ -217,55 +234,55 @@ public final class RenderManager implements MouseListener, MouseMotionListener, 
 	}
 	
 	@Override
-	public void mouseEntered(MouseEvent e){}
-	
-	@Override
-	public void mouseExited(MouseEvent e){}
-	
-	@Override
-	public void mouseDragged(MouseEvent e){
+	public void mouseEntered(MouseEvent e){
 		forEach(list, (item)->{
-			if(item instanceof MouseMotionListener){
-				if(item instanceof Locatable){
-					Rectangle2D bound = ((Locatable) item).getBounds();
-					if(!bound.contains(e.getPoint())){
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(false);
-						return;
-					}else{
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(true);
-					}
-				}
-				((MouseMotionListener) item).mouseDragged(e);
+			if(item instanceof MouseListener && !(item instanceof Locatable)){
+				((MouseListener) item).mouseEntered(e);
 			}
 		});
 	}
 	
 	@Override
-	public void mouseMoved(MouseEvent e){
+	public void mouseExited(MouseEvent e){
+		forEach(list, (item)->{
+			if(item instanceof MouseListener && !(item instanceof Locatable)){
+				((MouseListener) item).mouseExited(e);
+			}
+		});
+	}
+	
+	private final Point mouseHistory = new Point();
+	
+	@Override
+	public void mouseDragged(MouseEvent e){
+		Point mouse = e.getPoint();
 		forEach(list, (item)->{
 			if(item instanceof MouseMotionListener){
 				if(item instanceof Locatable){
 					Rectangle2D bound = ((Locatable) item).getBounds();
-					if(!bound.contains(e.getPoint())){
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(false);
-						if(item instanceof MouseListener)
-							((MouseListener) item).mouseExited(e);
+					if(!bound.contains(mouse))
 						return;
-					}else{
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(true);
-						if(item instanceof MouseListener){
-//							if(items)
-//								((MouseListener) item).mouseEntered(e);
-						}
-					}
+				}
+				((MouseMotionListener) item).mouseDragged(e);
+			}
+		});
+		updateMouse(e, mouse);
+	}
+	
+	@Override
+	public void mouseMoved(MouseEvent e){
+		Point mouse = e.getPoint();
+		forEach(list, (item)->{
+			if(item instanceof MouseMotionListener){
+				if(item instanceof Locatable){
+					Rectangle2D bound = ((Locatable) item).getBounds();
+					if(!bound.contains(mouse))
+						return;
 				}
 				((MouseMotionListener) item).mouseMoved(e);
 			}
 		});
+		updateMouse(e, mouse);
 	}
 	
 	@Override
@@ -274,16 +291,32 @@ public final class RenderManager implements MouseListener, MouseMotionListener, 
 			if(item instanceof MouseWheelListener){
 				if(item instanceof Locatable){
 					Rectangle2D bound = ((Locatable) item).getBounds();
-					if(!bound.contains(e.getPoint())){
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(false);
+					if(!bound.contains(e.getPoint()))
 						return;
-					}else{
-						if(item instanceof Hoverable)
-							((Hoverable) item).setHovering(true);
-					}
 				}
 				((MouseWheelListener) item).mouseWheelMoved(e);
+			}
+		});
+	}
+	
+	private synchronized void updateMouse(MouseEvent e, Point mouseCurrent){
+		callEnter(e, mouseHistory, mouseCurrent);
+		mouseHistory.setLocation(mouseCurrent);
+	}
+	
+	private void callEnter(MouseEvent e, Point mouseHistory, Point mouseCurrent){
+		forEach(list, (item)->{
+			if(item instanceof MouseListener && item instanceof Locatable){
+				Rectangle2D bound = ((Locatable) item).getBounds();
+				if(bound.contains(mouseHistory)){
+					if(!bound.contains(mouseCurrent)){
+						((MouseListener) item).mouseExited(e);
+					}
+				}else{
+					if(bound.contains(mouseCurrent)){
+						((MouseListener) item).mouseEntered(e);
+					}
+				}
 			}
 		});
 	}

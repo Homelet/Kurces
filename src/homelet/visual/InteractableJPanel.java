@@ -52,10 +52,14 @@ public final class InteractableJPanel extends JPanel implements Interactable{
 	@Override
 	protected void paintComponent(Graphics g){
 		super.paintComponent(g);
-		Graphics2D g2        = (Graphics2D) g;
-		Dimension  dimension = this.getSize();
+		manager.tick();
+		render((Graphics2D) g);
+	}
+	
+	private void render(Graphics2D g){
+		Dimension dimension = this.getSize();
 		if(manager.isClearingScreen())
-			g2.clearRect(0, 0, dimension.width, dimension.height);
+			g.clearRect(0, 0, dimension.width, dimension.height);
 		/////////////////////-draw Start-/////////////////////
 		manager.render((Graphics2D) g.create(0, 0, dimension.width, dimension.height));
 		/////////////////////-draw End-//////////////////////
