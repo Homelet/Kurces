@@ -5,7 +5,7 @@ import java.awt.geom.*;
 import java.awt.image.ImageObserver;
 
 /**
- * The type Gh.
+ * The type ShapeUtil.
  */
 public class ShapeUtil{
 	
@@ -31,8 +31,8 @@ public class ShapeUtil{
 	 * @param height the height
 	 * @return the point
 	 */
-	public static Dimension2D size(int width, int height){
-		return new Dimension(width, height);
+	public static Dimension2D size(double width, double height){
+		return new Dimension((int) width, (int) height);
 	}
 	// ===================================== line =====================================
 	

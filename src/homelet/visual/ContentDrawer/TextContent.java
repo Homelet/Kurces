@@ -1,28 +1,52 @@
 package homelet.visual.ContentDrawer;
 
+import com.sun.xml.internal.ws.api.model.MEP;
 import homelet.utils.Border;
+import homelet.utils.ShapeUtil;
+import homelet.utils.ToolBox;
 
 import java.awt.*;
+import java.awt.font.LineMetrics;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.text.AttributedCharacterIterator;
 
 public class TextContent extends Content{
 	
 	public static final double SCRIPT_RATIO = 0.66;
 	public static final Font   DEFAULT_FONT = new Font("Lucida Grande", Font.PLAIN, 13);
 	private             String content;
+	private             Style  style;
 	
 	class TextContentInfo implements Positioning{
 		
 		@Override
 		public void position(double x, double y){
-			this.x = x;
-			this.y = y;
+			point.setLocation(x, y);
 		}
 		
-		final Dimension2D bound;
+		final Dimension   bound;
+		final Point2D     point;
 		final String      content;
-		double x, y;
+		final int         baseLine;
+		final LineMetrics line;
+		
+		public TextContentInfo(String content, Graphics2D g, FontMetrics metrics, double fontHeight){
+			this.content = content;
+			this.line = metrics.getLineMetrics(content, g);
+			this.bound = metrics.getStringBounds(content, g).getBounds().getSize();
+			this.baseLine = (int) Math.floor(ToolBox.max(line.getBaselineOffsets()));
+			this.point = ShapeUtil.point(0, 0);
+		}
+		
+		void render(Graphics2D g){
+			g.setColor(style.background);
+			g.draw(ShapeUtil.rectangle(point, bound));
+			g.setColor(style.color);
+			g.setFont(style.font);
+			g.drawString(content, (float) point.getX(), (float) point.getY());
+		}
 	}
 	
 	public class Style implements Styling{
@@ -87,6 +111,11 @@ public class TextContent extends Content{
 		
 		public Style background(Color background){
 			this.background = background;
+			return this;
+		}
+		
+		public Style fontSize(float size){
+			this.font = font.deriveFont(size);
 			return this;
 		}
 		
