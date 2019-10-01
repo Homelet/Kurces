@@ -30,10 +30,6 @@ public abstract class Line{
 	
 	/**
 	 * X, Y are the center of posit
-	 * 	 * @param g
-	 * @param x
-	 * @param y
-	 * @param length
 	 */
 	public abstract void draw(Graphics2D g, int x, int y, int length);
 	
@@ -46,20 +42,8 @@ public abstract class Line{
 		@Override
 		public void draw(Graphics2D g, int x, int y, int length){
 			g.setColor(color);
-			g.draw(ShapeUtil.rectangle(x, y, length, thickness));
-		}
-	}
-	
-	public static class DoubleColor extends Line{
-		
-		public Solid(int thickness, Color color){
-			super(thickness, color);
-		}
-		
-		@Override
-		public void draw(Graphics2D g, int x, int y, int length){
-			g.setColor(color);
-			g.draw(ShapeUtil.rectangle(x, y, length, thickness));
+			double top_bottom = length / 2;
+			g.draw(ShapeUtil.rectangle_expand(x, y, top_bottom, top_bottom, 0, length));
 		}
 	}
 }

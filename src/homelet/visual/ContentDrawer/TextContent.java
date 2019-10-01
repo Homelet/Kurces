@@ -1,7 +1,7 @@
 package homelet.visual.ContentDrawer;
 
-import com.sun.xml.internal.ws.api.model.MEP;
 import homelet.utils.Border;
+import homelet.utils.Line;
 import homelet.utils.ShapeUtil;
 import homelet.utils.ToolBox;
 
@@ -41,8 +41,10 @@ public class TextContent extends Content{
 		}
 		
 		void render(Graphics2D g){
+			// draw Background
 			g.setColor(style.background);
 			g.draw(ShapeUtil.rectangle(point, bound));
+			// draw Content
 			g.setColor(style.color);
 			g.setFont(style.font);
 			g.drawString(content, (float) point.getX(), (float) point.getY());
@@ -59,8 +61,8 @@ public class TextContent extends Content{
 		private Font        font;
 		private Color       color;
 		private Color       background;
-		private boolean     underline;
-		private boolean     strikeTrough;
+		private Line        underline;
+		private Line        strikeTrough;
 		private ScriptStyle scriptStyle;
 		private Border      border;
 		
@@ -68,13 +70,13 @@ public class TextContent extends Content{
 			this.font = DEFAULT_FONT;
 			this.color = Color.BLACK;
 			this.background = null;
-			this.underline = false;
-			this.strikeTrough = false;
+			this.underline = ContentDrawer.DEFAULT_LINE;
+			this.strikeTrough = ContentDrawer.DEFAULT_LINE;
 			this.scriptStyle = ScriptStyle.NORMAL;
 			this.border = null;
 		}
 		
-		public Style(Font font, Color color, Color background, boolean underline, boolean strikeTrough, ScriptStyle scriptStyle, Border border){
+		public Style(Font font, Color color, Color background, Line underline, Line strikeTrough, ScriptStyle scriptStyle, Border border){
 			this.font = font;
 			this.color = color;
 			this.background = background;
@@ -146,20 +148,20 @@ public class TextContent extends Content{
 			return this;
 		}
 		
-		public boolean underline(){
+		public Line underline(){
 			return underline;
 		}
 		
-		public Style underline(boolean underline){
+		public Style underline(Line underline){
 			this.underline = underline;
 			return this;
 		}
 		
-		public boolean strikeTrough(){
+		public Line strikeTrough(){
 			return strikeTrough;
 		}
 		
-		public Style strikeTrough(boolean strikeTrough){
+		public Style strikeTrough(Line strikeTrough){
 			this.strikeTrough = strikeTrough;
 			return this;
 		}
